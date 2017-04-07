@@ -310,10 +310,10 @@ const commands = [
 			bot.user.setAvatar(url).then(() => {
 				message.reply('✔ Avatar set!');
 			})
-			.catch(err => {
-				message.reply('Error: Unable to set avatar');
-				console.log('Error on setavatar command:', err);
-			});
+				.catch(err => {
+					message.reply('Error: Unable to set avatar');
+					console.log('Error on setavatar command:', err);
+				});
 		}
 	},
 
@@ -328,8 +328,8 @@ const commands = [
 			}
 
 			bot.user.setUsername(userName).then(
-				message.reply('✔ Username set!')
-			)
+					message.reply('✔ Username set!')
+				)
 				.catch(err => {
 					message.reply('Error: Unable to set username');
 					console.log('Error on setusername command:', err);
