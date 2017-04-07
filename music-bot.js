@@ -304,7 +304,7 @@ const commands = [
 				url = aliases[url.toLowerCase()];
 			}
 
-			bot.user.setAvatar(url).then(user => {
+			bot.user.setAvatar(url).then(() => {
 				message.reply('✔ Avatar set!');
 			})
 			.catch(err => {
