@@ -4,7 +4,7 @@
   "description": "Simple music bot for Discord servers.",
   "main": "musicbot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "xo"
   },
   "repository": {
     "type": "git",
@@ -29,5 +29,8 @@
   "engines": {
     "node": ">=6.0.0"
   },
-  "homepage": "https://github.com/agubelu/discord-music-bot#readme"
+  "homepage": "https://github.com/agubelu/discord-music-bot#readme",
+  "devDependencies": {
+    "xo": "^0.18.1"
+  }
 }
