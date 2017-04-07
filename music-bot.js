@@ -58,6 +58,7 @@ const commands = [
 				if (voiceHandler !== null) {
 					voiceHandler.end();
 				}
+				bot.user.setGame();
 				message.reply('Stopping!');
 			}
 		}
