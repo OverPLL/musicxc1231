@@ -42,12 +42,12 @@ var textChannelName = "Your text channel name here (without #)";
 var voiceChannelName = "Your voice channel name here";
 var aliasesFile = "A file the bot will use to store your aliases";
 var botToken = "Your bot token here";
-var autoplayFile = "autoplay";
+var autoplayFile = "A file the bot will read to autoplay from. One youtube link should be entered per line in this file";
 var autoPlay = true;
 
 bot.run(serverName, textChannelName, voiceChannelName, aliasesFile, botToken, autoplayFile, autoPlay);
 ```
-The aliases file parameter can be just a filename or a path to a file. If it does not exist, it will be generated. If you provide a filename, it will be generated in the same folder as the previous script. Any filename will do.
+The aliases and autoplay file parameters can be just a filename or a path to a file. If it does not exist, it will be generated. If you provide a filename, it will be generated in the same folder as the previous script. Any filename will do.
 
 The bot will join the voice channel that you configured when it connects to the server, but obviously you can move it to other voice channels once it joins. The text channel is the one the bot will use to listen to commands and announce stuff. Keep in mind that all names are case-sensitive!
 

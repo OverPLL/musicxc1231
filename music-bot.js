@@ -648,6 +648,12 @@ exports.run = function (serverName, textChannelName, voiceChannelName, aliasesPa
 			}
 		});
 
+		fs.access(autoPlaylistFilePath, fs.F_OK, err => {
+			if (err) {
+				fs.closeSync(fs.openSync(autoPlaylistFilePath, 'w'));
+			}
+		});
+
 		bot.user.setGame();
 
 		console.log('Connected!');
