@@ -2,7 +2,7 @@
   "name": "discord-music-bot",
   "version": "2.2.0",
   "description": "Simple music bot for Discord servers.",
-  "main": "musicbot.js",
+  "main": "music-bot.js",
   "scripts": {
     "test": "xo"
   },
