@@ -42,6 +42,8 @@ let textChannel = null;
 
 let ytApiKey = null;
 
+let adminUserId;
+
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,6 +141,7 @@ const commands = [
 		command: 'setnp',
 		description: 'Sets whether the bot will announce the current song or not',
 		parameters: ['on/off'],
+		authentication: true,
 		execute(message, params) {
 			let response;
 			if (params[1].toLowerCase() === 'on') {
@@ -214,6 +217,7 @@ const commands = [
 		command: 'clearqueue',
 		description: 'Removes all songs from the queue',
 		parameters: [],
+		authentication: true,
 		execute(message) {
 			queue = [];
 			message.reply('Queue has been clered!');
@@ -224,6 +228,7 @@ const commands = [
 		command: 'remove',
 		description: 'Removes a song from the queue',
 		parameters: ['Request index or \'last\''],
+		authentication: true,
 		execute(message, params) {
 			let index = params[1];
 
@@ -270,6 +275,7 @@ const commands = [
 		command: 'setalias',
 		description: 'Sets an alias, overriding the previous one if it already exists',
 		parameters: ['alias', 'video URL or ID'],
+		authentication: true,
 		execute(message, params) {
 			const alias = params[1].toLowerCase();
 			const val = params[2];
@@ -285,6 +291,7 @@ const commands = [
 		command: 'deletealias',
 		description: 'Deletes an existing alias',
 		parameters: ['alias'],
+		authentication: true,
 		execute(message, params) {
 			const alias = params[1].toLowerCase();
 			if (Object.prototype.hasOwnProperty.call(aliases, alias)) {
@@ -301,6 +308,7 @@ const commands = [
 		command: 'setavatar',
 		description: 'Set bot avatar, overriding the previous one if it already exists',
 		parameters: ['Image URL or alias'],
+		authentication: true,
 		execute(message, params) {
 			let url = params[1];
 			if (Object.prototype.hasOwnProperty.call(aliases, url.toLowerCase())) {
@@ -321,6 +329,7 @@ const commands = [
 		command: 'setusername',
 		description: 'Set username of bot',
 		parameters: ['username or alias'],
+		authentication: true,
 		execute(message, params) {
 			let userName = params[1];
 			if (Object.prototype.hasOwnProperty.call(aliases, userName.toLowerCase())) {
@@ -341,6 +350,7 @@ const commands = [
 		command: 'setautoplay',
 		description: 'Sets whether the bot will autoplay from ' + autoPlaylistFilePath + ' or not.',
 		parameters: ['on/off'],
+		authentication: true,
 		execute(message, params) {
 			let response;
 			if (params[1].toLowerCase() === 'on') {
@@ -491,6 +501,13 @@ function handleCommand(message, text) {
 	const params = text.split(' ');
 	const command = searchCommand(params[0]);
 
+	if (command && command.authentication) {
+		if (!isAdminUser(message)) {
+			message.reply('You do not have permission.');
+			return;
+		}
+	}
+
 	if (command) {
 		if (params.length - 1 < command.parameters.length) {
 			message.reply('Insufficient parameters!');
@@ -583,6 +600,13 @@ function startAutoPlaylist() {
 		}
 	});
 }
+
+function isAdminUser(message) {
+	if (adminUserId.indexOf(message.author.id) !== -1) {
+		return true;
+	}
+	return false;
+}
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -611,10 +635,11 @@ function getPlaylistId(string) {
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-exports.run = function (serverName, textChannelName, voiceChannelName, aliasesPath, token, autoplayPath, autoPlay) { // eslint-disable-line max-params
+exports.run = function (serverName, textChannelName, voiceChannelName, aliasesPath, token, autoplayPath, autoPlay, adminUser) { // eslint-disable-line max-params
 	aliasesFilePath = aliasesPath;
 	autoPlaylistFilePath = autoplayPath;
 	autoPlayToggle = autoPlay;
+	adminUserId = adminUser;
 
 	bot.on('ready', () => {
 		const server = bot.guilds.find('name', serverName);

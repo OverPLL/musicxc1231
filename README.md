@@ -44,8 +44,9 @@ var aliasesFile = "A file the bot will use to store your aliases";
 var botToken = "Your bot token here";
 var autoplayFile = "A file the bot will read to autoplay from. One youtube link should be entered per line in this file";
 var autoPlay = true;
+var adminUsers = 'Array of User IDs';
 
-bot.run(serverName, textChannelName, voiceChannelName, aliasesFile, botToken, autoplayFile, autoPlay);
+bot.run(serverName, textChannelName, voiceChannelName, aliasesFile, botToken, autoplayFile, autoPlay, adminUsers);
 ```
 The aliases and autoplay file parameters can be just a filename or a path to a file. If it does not exist, it will be generated. If you provide a filename, it will be generated in the same folder as the previous script. Any filename will do.
 
@@ -64,3 +65,20 @@ In order to use the !search command, you must provide the bot with a YouTube API
     ```js
     bot.setYoutubeKey("place your API key here");
     ```
+
+# Permissions
+
+To get user IDs turn on Developer Mode in the Discord client (`User Settings` -> `Appearance`) and then right-click your name/icon anywhere in the client and select `Copy ID`
+
+Any command with `authentication: true` set will require issuing user to be in adminUsers array.
+
+The current commands locked to admins are:
+
+* setnp
+* clearqueue
+* remove
+* setalias
+* deletealias
+* setavatar
+* setusername
+* setautoplay
