@@ -358,6 +358,16 @@ const commands = [
 		}
 	},
 
+	{
+		command: 'saveplaylist',
+		description: 'Send text file containing all video URLs in playlist to channel.',
+		parameters: ['playlist/alias'],
+		execute(message, params) {
+			if (Object.prototype.hasOwnProperty.call(aliases, params[1].toLowerCase())) {
+				params[1] = aliases[params[1].toLowerCase()];
+			}
+			savePlaylist(getPlaylistId(params[1]), message);
+		}
 	}
 
 ];
@@ -530,6 +540,36 @@ function queuePlaylist(playlistId, message, pageToken = '') {
 	});
 }
 
+function savePlaylist(playlistId, message, pageToken = '') {
+	const tmpPlaylist = fs.createWriteStream('tmpPlaylist', {
+		flags: 'a'
+	});
+	request('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=' + playlistId + '&key=' + ytApiKey + '&pageToken=' + pageToken, (error, response, body) => {
+		const json = JSON.parse(body);
+		if ('error' in json) {
+			message.reply('An error has occurred: ' + json.error.errors[0].message + ' - ' + json.error.errors[0].reason);
+		} else if (json.items.length === 0) {
+			message.reply('No videos found within playlist.');
+		} else {
+			for (let i = 0; i < json.items.length; i++) {
+				tmpPlaylist.write('https://www.youtube.com/watch?v=' + json.items[i].snippet.resourceId.videoId + '\n');
+			}
+			if (typeof json.nextPageToken === 'undefined') {
+				tmpPlaylist.end();
+				message.channel.sendFile('tmpPlaylist', 'playlist.txt', 'Saved all videos of playlist (' + playlistId + ')').then(() => {
+					fs.unlink('tmpPlaylist', err => {
+						if (err) {
+							console.log(err);
+						}
+					});
+				});
+				return;
+			}
+			savePlaylist(playlistId, message, json.nextPageToken);
+		}
+	});
+}
+
 function startAutoPlaylist() {
 	fs.access(autoPlaylistFilePath, fs.F_OK, err => {
 		if (!err) {
@@ -553,6 +593,16 @@ function getVideoId(string) {
 
 	if (matches) {
 		return matches[1];
+	}
+	return string;
+}
+
+function getPlaylistId(string) {
+	const regex = /^.*(youtu.be\/|list=)([^#&?]*).*/;
+	const matches = string.match(regex);
+
+	if (matches) {
+		return matches[2];
 	}
 	return string;
 }
