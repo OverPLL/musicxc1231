@@ -5,7 +5,7 @@ A Node.JS Discord bot that takes song requests from videos on YouTube, queues th
 I made it totally *ad-hoc* for my personal server so it doesn't support multiple servers for a single instance or anything like that, but it can be customised very easily to make it work on any server you want.
 
 # Available commands
-- **!request <video/alias>** - Adds a YouTube video to the queue. You can provide the full URL, just the video ID or an alias.
+- **!request <video/playlist/alias>** - Adds a YouTube video or playlist to the queue. You can provide the full URL, just the video ID, full playlist URL or an alias.
 - **!search <query>** - Searches for a video on YouTube and adds it to the queue. Requires a [YouTube API key](#obtaining-a-youtube-api-key).
 - **!stop** - Stops the playback, the bot will not continue with the pending queue until !resume is issued.
 - **!resume** - Allows the bot to play videos from the queue again after !stop was issued.
@@ -19,6 +19,8 @@ I made it totally *ad-hoc* for my personal server so it doesn't support multiple
 - **!setalias <alias> <video>**: Maps any word of your choice (*alias*) to a video URL or ID, so you can !request the alias instead.
 - **!deletealias <alias>** - Removes an existing alias.
 - **!aliases** - Displays the stored aliases.
+- **!setavatar <image url/alias>** - Set avatar of bot.
+- **!setusername <username/alias>** - Set username of bot.
 
 # How to make it work?
 

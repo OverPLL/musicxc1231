@@ -295,12 +295,11 @@ const commands = [
 	},
 
 	{
-		command: "setavatar",
-		description: "Set bot avatar, overriding the previous one if it already exists",
-		parameters: ["Image URL or alias"],
-		execute: function (message, params) {
-
-			var url = params[1];
+		command: 'setavatar',
+		description: 'Set bot avatar, overriding the previous one if it already exists',
+		parameters: ['Image URL or alias'],
+		execute(message, params) {
+			let url = params[1];
 			if (Object.prototype.hasOwnProperty.call(aliases, url.toLowerCase())) {
 				url = aliases[url.toLowerCase()];
 			}
@@ -308,7 +307,7 @@ const commands = [
 			bot.user.setAvatar(url).then(user => {
 				message.reply('✔ Avatar set!');
 			})
-			.catch((err) => {
+			.catch(err => {
 				message.reply('Error: Unable to set avatar');
 				console.log('Error on setavatar command:', err);
 			});
@@ -317,8 +316,8 @@ const commands = [
 
 	{
 		command: 'setusername',
-		description: 'Set bot avatar, overriding the previous one if it already exists',
-		parameters: ['Username or alias'],
+		description: 'Set username of bot',
+		parameters: ['username or alias'],
 		execute(message, params) {
 			let userName = params[1];
 			if (Object.prototype.hasOwnProperty.call(aliases, userName.toLowerCase())) {
@@ -472,7 +471,7 @@ function searchVideo(message, query) {
 
 function queuePlaylist(playlistId, message, pageToken = '') {
 	request('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=' + playlistId + '&key=' + ytApiKey + '&pageToken=' + pageToken, (error, response, body) => {
-		let json = JSON.parse(body);
+		const json = JSON.parse(body);
 		if ('error' in json) {
 			message.reply('An error has occurred: ' + json.error.errors[0].message + ' - ' + json.error.errors[0].reason);
 		} else if (json.items.length === 0) {
