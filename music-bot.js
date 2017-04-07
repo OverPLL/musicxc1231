@@ -440,7 +440,12 @@ function playNextSong() {
 	nowPlayingData.user = user;
 
 	if (informNp) {
-		textChannel.sendMessage('Now playing: "' + title + '" (requested by ' + user + ')');
+		const embed = new Discord.RichEmbed()
+			.setTitle('Now playing: ' + title)
+			.setImage('https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg')
+			.setURL('https://www.youtube.com/watch?v=' + videoId)
+			.setFooter('Requested by ' + user);
+		textChannel.sendEmbed(embed);
 		bot.user.setGame(title);
 	}
 
