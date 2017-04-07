@@ -41,8 +41,10 @@ var textChannelName = "Your text channel name here (without #)";
 var voiceChannelName = "Your voice channel name here";
 var aliasesFile = "A file the bot will use to store your aliases";
 var botToken = "Your bot token here";
+var autoplayFile = "autoplay";
+var autoPlay = true;
 
-bot.run(serverName, textChannelName, voiceChannelName, aliasesFile, botToken);
+bot.run(serverName, textChannelName, voiceChannelName, aliasesFile, botToken, autoplayFile, autoPlay);
 ```
 The aliases file parameter can be just a filename or a path to a file. If it does not exist, it will be generated. If you provide a filename, it will be generated in the same folder as the previous script. Any filename will do.
 

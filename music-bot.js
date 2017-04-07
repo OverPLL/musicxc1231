@@ -26,9 +26,11 @@ const bot = new Discord.Client({
 const dmText = 'Hey there! Use !commands on a public chat room to see the command list.';
 const mentionText = 'Use !commands to see the command list.';
 let aliasesFilePath = 'aliases.json';
+let autoPlaylistFilePath = 'autoplaylist.txt';
 
 let stopped = false;
 let informNp = true;
+let autoPlayToggle = true;
 
 const nowPlayingData = {};
 let queue = [];
@@ -333,6 +335,29 @@ const commands = [
 					console.log('Error on setusername command:', err);
 				});
 		}
+	},
+
+	{
+		command: 'setautoplay',
+		description: 'Sets whether the bot will autoplay from ' + autoPlaylistFilePath + ' or not.',
+		parameters: ['on/off'],
+		execute(message, params) {
+			let response;
+			if (params[1].toLowerCase() === 'on') {
+				response = 'Will autoplay songs';
+				autoPlayToggle = true;
+				startAutoPlaylist();
+			} else if (params[1].toLowerCase() === 'off') {
+				response = 'Will no longer autoplay songs';
+				autoPlayToggle = false;
+			} else {
+				response = 'Sorry?';
+			}
+
+			message.reply(response);
+		}
+	},
+
 	}
 
 ];
@@ -367,22 +392,31 @@ bot.on('message', message => {
 
 function addToQueue(video, message, mute = false) {
 	if (Object.prototype.hasOwnProperty.call(aliases, video.toLowerCase())) {
-	// If (aliases.hasOwnProperty(video.toLowerCase())) {
 		video = aliases[video.toLowerCase()];
 	}
 
 	const videoId = getVideoId(video);
 
 	ytdl.getInfo('https://www.youtube.com/watch?v=' + videoId, (error, info) => {
-		if (error) {
+		if (error && !mute) {
 			message.reply('The requested video (' + videoId + ') does not exist or cannot be played.');
 			console.log('Error (' + videoId + '): ' + error);
 		} else {
-			queue.push({
-				title: info.title,
-				id: videoId,
-				user: message.author.username
-			});
+			if (typeof info.title !== 'undefined') {
+				if (message) {
+					queue.push({
+						title: info.title,
+						id: videoId,
+						user: message.author.username
+					});
+				} else {
+					queue.push({
+						title: info.title,
+						id: videoId,
+						user: 'AutoPlay'
+					});
+				}
+			}
 			if (!mute) {
 				message.reply('"' + info.title + '" has been added to the queue.');
 			}
@@ -420,6 +454,8 @@ function playNextSong() {
 		bot.user.setGame();
 		if (!stopped && !isQueueEmpty()) {
 			playNextSong();
+		} else if (autoPlayToggle) {
+			startAutoPlaylist();
 		}
 	});
 
@@ -489,6 +525,19 @@ function queuePlaylist(playlistId, message, pageToken = '') {
 	});
 }
 
+function startAutoPlaylist() {
+	fs.access(autoPlaylistFilePath, fs.F_OK, err => {
+		if (!err) {
+			const lineReader = require('readline').createInterface({
+				input: require('fs').createReadStream(autoPlaylistFilePath)
+			});
+
+			lineReader.on('line', line => {
+				addToQueue(getVideoId(line), null, true);
+			});
+		}
+	});
+}
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -507,8 +556,10 @@ function getVideoId(string) {
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-exports.run = function (serverName, textChannelName, voiceChannelName, aliasesPath, token) { // eslint-disable-line max-params
+exports.run = function (serverName, textChannelName, voiceChannelName, aliasesPath, token, autoplayPath, autoPlay) { // eslint-disable-line max-params
 	aliasesFilePath = aliasesPath;
+	autoPlaylistFilePath = autoplayPath;
+	autoPlayToggle = autoPlay;
 
 	bot.on('ready', () => {
 		const server = bot.guilds.find('name', serverName);
@@ -545,6 +596,9 @@ exports.run = function (serverName, textChannelName, voiceChannelName, aliasesPa
 		bot.user.setGame();
 
 		console.log('Connected!');
+		if (autoPlay) {
+			startAutoPlaylist();
+		}
 	});
 
 	bot.login(token);
