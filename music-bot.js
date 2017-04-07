@@ -284,12 +284,12 @@ const commands = [
 		parameters: ['alias'],
 		execute(message, params) {
 			const alias = params[1].toLowerCase();
-			if (!Object.prototype.hasOwnProperty.call(aliases, alias)) {
-				message.reply('Alias ' + alias + ' does not exist');
-			} else {
+			if (Object.prototype.hasOwnProperty.call(aliases, alias)) {
 				delete aliases[alias];
 				fs.writeFileSync(aliasesFilePath, JSON.stringify(aliases));
 				message.reply('Alias "' + alias + '" deleted successfully.');
+			} else {
+				message.reply('Alias ' + alias + ' does not exist');
 			}
 		}
 	},
