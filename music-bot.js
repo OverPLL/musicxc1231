@@ -412,7 +412,7 @@ function addToQueue(video, message, mute = false) {
 			message.reply('The requested video (' + videoId + ') does not exist or cannot be played.');
 			console.log('Error (' + videoId + '): ' + error);
 		} else {
-			if (typeof info.title !== 'undefined') {
+			if (typeof info !== 'undefined') {
 				if (message) {
 					queue.push({
 						title: info.title,
