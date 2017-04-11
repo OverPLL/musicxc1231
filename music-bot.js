@@ -30,7 +30,7 @@ let autoPlaylistFilePath = 'autoplaylist.txt';
 
 let stopped = false;
 let informNp = true;
-let autoPlayToggle = true;
+let autoPlayToggle;
 
 const nowPlayingData = {};
 let queue = [];
