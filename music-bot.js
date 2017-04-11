@@ -150,6 +150,7 @@ const commands = [
 			} else if (params[1].toLowerCase() === 'off') {
 				response = 'Will no longer announce song names in chat';
 				informNp = false;
+				bot.user.setGame();
 			} else {
 				response = 'Sorry?';
 			}
