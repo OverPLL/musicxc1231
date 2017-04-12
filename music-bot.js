@@ -657,26 +657,26 @@ function getPlaylistId(string) {
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-exports.run = function (serverName, textChannelName, voiceChannelName, aliasesPath, token, autoplayPath, autoPlay, adminUser) { // eslint-disable-line max-params
+exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, token, autoplayPath, autoPlay, adminUser) { // eslint-disable-line max-params
 	aliasesFilePath = aliasesPath;
 	autoPlaylistFilePath = autoplayPath;
 	autoPlayToggle = autoPlay;
 	adminUserId = adminUser;
 
 	bot.on('ready', () => {
-		const server = bot.guilds.find('name', serverName);
+		const server = bot.guilds.get(serverId);
 		if (server === null) {
-			throw new Error('Couldn\'t find server ' + serverName);
+			throw new Error('Couldn\'t find server ' + serverId);
 		}
 
-		const voiceChannel = server.channels.find(chn => chn.name === voiceChannelName && chn.type === 'voice'); // The voice channel the bot will connect to
+		const voiceChannel = server.channels.find(chn => chn.id === voiceChannelId && chn.type === 'voice'); // The voice channel the bot will connect to
 		if (voiceChannel === null) {
-			throw new Error('Couldn\'t find voice channel ' + voiceChannelName + ' in server ' + serverName);
+			throw new Error('Couldn\'t find voice channel ' + voiceChannelId + ' in server ' + serverId);
 		}
 
-		textChannel = server.channels.find(chn => chn.name === textChannelName && chn.type === 'text'); // The text channel the bot will use to announce stuff
+		textChannel = server.channels.find(chn => chn.id === textChannelId && chn.type === 'text'); // The text channel the bot will use to announce stuff
 		if (textChannel === null) {
-			throw new Error('Couldn\'t find text channel #' + textChannelName + ' in server ' + serverName);
+			throw new Error('Couldn\'t find text channel #' + textChannelId + ' in server ' + serverId);
 		}
 
 		voiceChannel.join().then(connection => {
