@@ -87,7 +87,7 @@ const commands = [
 	{
 		command: 'request',
 		description: 'Adds the requested video to the playlist queue',
-		parameters: ['video URL, ID or alias'],
+		parameters: ['playlist URL, video URL, video ID or alias'],
 		execute(message, params) {
 			if (Object.prototype.hasOwnProperty.call(aliases, params[1].toLowerCase())) {
 				params[1] = aliases[params[1].toLowerCase()];
