@@ -24,7 +24,8 @@
     "discord.js": "^11.0.0",
     "node-opus": "^0.2.4",
     "request": "^2.79.0",
-    "ytdl-core": "^0.7.21"
+    "ytdl-core": "^0.7.21",
+    "loggerr": "^1.7.0"
   },
   "engines": {
     "node": ">=6.0.0"

@@ -17,6 +17,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const ytdl = require('ytdl-core');
 const request = require('request');
+const Loggerr = require('loggerr');
 
 const bot = new Discord.Client({
 	autoReconnect: true,
@@ -43,6 +44,17 @@ let textChannel = null;
 let ytApiKey = null;
 
 let adminUserId;
+
+const logfile = fs.createWriteStream('./log', {
+	flags: 'a',
+	encoding: 'utf8'
+});
+
+const log = new Loggerr({
+	streams: Loggerr.levels.map(() => {
+		return logfile;
+	})
+});
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -507,6 +519,7 @@ function handleCommand(message, text) {
 			message.delete()
         .catch(console.error);
 			message.author.sendMessage('You do not have permission to use command: ' + command.command);
+			log.warning('User ' + message.author.username + ' (' + message.author.id + ') tried to use the command ' + command.command + ' but has insufficient permissions');
 			return;
 		}
 	}
