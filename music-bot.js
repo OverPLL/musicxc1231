@@ -504,14 +504,22 @@ function handleCommand(message, text) {
 
 	if (command && command.authentication) {
 		if (!isAdminUser(message)) {
-			message.reply('You do not have permission.');
+			message.delete()
+        .catch(console.error);
+			message.author.sendMessage('You do not have permission to use command: ' + command.command);
 			return;
 		}
 	}
 
 	if (command) {
 		if (params.length - 1 < command.parameters.length) {
-			message.reply('Insufficient parameters!');
+			message.delete()
+        .catch(console.error);
+			let paramsString = '';
+			for (let i = 0; i < command.parameters.length; i++) {
+				paramsString += '[' + command.parameters[i] + '] ';
+			}
+			message.author.sendMessage('Insufficient parameters!\n!' + command.command + ' ' + paramsString.trim());
 		} else {
 			command.execute(message, params);
 		}
