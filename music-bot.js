@@ -30,7 +30,7 @@ let aliasesFilePath = 'aliases.json';
 let autoPlaylistFilePath = 'autoplaylist.txt';
 
 let stopped = false;
-let informNp = true;
+let informNp = false;
 let autoPlayToggle;
 
 const nowPlayingData = {};
