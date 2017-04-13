@@ -553,6 +553,7 @@ function playNextSong() {
 
 	nowPlayingData.title = title;
 	nowPlayingData.user = user;
+	nowPlayingData.videoId = videoId;
 
 	if (informNp) {
 		const embed = new Discord.RichEmbed()
