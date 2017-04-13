@@ -511,6 +511,7 @@ function playNextSong() {
 		filter: 'audioonly'
 	});
 	voiceHandler = voiceConnection.playStream(audioStream);
+	voiceHandler.setVolumeDecibels('-20');
 
 	voiceHandler.once('end', () => {
 		voiceHandler = null;
