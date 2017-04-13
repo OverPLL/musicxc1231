@@ -235,7 +235,7 @@ const commands = [
 		authentication: true,
 		execute(message) {
 			queue = [];
-			message.reply('Queue has been clered!');
+			message.reply('Queue has been cleared!');
 		}
 	},
 
