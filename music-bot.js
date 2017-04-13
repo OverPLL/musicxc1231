@@ -421,8 +421,28 @@ const commands = [
 				voiceConnection = connection;
 			}).catch(console.error);
 		}
-	}
+	},
 
+	{
+		command: 'purge',
+		description: 'Delete all unpinned messages from text channel',
+		parameters: [],
+		authentication: true,
+		execute(message) {
+			message.channel.fetchMessages({
+				limit: 100
+			}).then(result => {
+				result.every(result => {
+					if (!result.pinned) {
+						result.delete()
+							.then(console.log('Deleted ' + result.id))
+							.catch(console.error);
+					}
+					return true;
+				});
+			});
+		}
+	}
 ];
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////

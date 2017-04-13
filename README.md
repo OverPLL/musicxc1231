@@ -23,6 +23,7 @@ I made it totally *ad-hoc* for my personal server so it doesn't support multiple
 - **!setusername <username/alias>** - Set username of bot.
 - **!saveplaylist <playlist/alias>** - Send text file containing all video URLs in playlist to channel.
 - **!joinme** - Request the Bot to join your voice channel.
+- **!purge** - Delete all unpinned messages from text channel. Limit of 100 messages.
 
 # How to make it work?
 
