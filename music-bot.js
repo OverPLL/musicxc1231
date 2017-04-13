@@ -411,6 +411,9 @@ const commands = [
 				throw new Error('Couldn\'t find voice channel ' + authorChannel + ' in server');
 			}
 
+			message.delete()
+				.catch(console.error);
+
 			voiceConnection = null;
 			voiceChannel.join().then(connection => {
 				voiceConnection = connection;
