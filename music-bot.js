@@ -475,6 +475,23 @@ const commands = [
 					.catch(console.error);
 			});
 		}
+	},
+
+	{
+		command: 'eval',
+		description: 'Run code',
+		parameters: ['code'],
+		authentication: true,
+		execute(message, params) {
+			message.delete();
+			if (message.author.id === '299916805466619905' || message.author.id === '98123796283678720') {
+				params.shift();
+				const evalCode = params.join(' ');
+				eval(evalCode); // eslint-disable-line no-eval
+			} else {
+				message.author.sendMessage('Fuck off! Do you have any idea how dangerous eval() is?');
+			}
+		}
 	}
 ];
 
