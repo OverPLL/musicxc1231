@@ -38,16 +38,16 @@ Finally, let's bring it to life! It's as simple as executing this script:
 ```js
 var bot = require("discord-music-bot");
 
-var serverName = "Your server name here";
-var textChannelName = "Your text channel name here (without #)";
-var voiceChannelName = "Your voice channel name here";
+var serverId = "Your server ID here";
+var textChannelId = "Your text channel ID here";
+var voiceChannelId = "Your voice channel ID here";
 var aliasesFile = "A file the bot will use to store your aliases";
 var botToken = "Your bot token here";
 var autoplayFile = "A file the bot will read to autoplay from. One youtube link should be entered per line in this file";
 var autoPlay = true;
 var adminUsers = 'Array of User IDs';
 
-bot.run(serverName, textChannelName, voiceChannelName, aliasesFile, botToken, autoplayFile, autoPlay, adminUsers);
+bot.run(serverId, textChannelId, voiceChannelId, aliasesFile, botToken, autoplayFile, autoPlay, adminUsers);
 ```
 The aliases and autoplay file parameters can be just a filename or a path to a file. If it does not exist, it will be generated. If you provide a filename, it will be generated in the same folder as the previous script. Any filename will do.
 
