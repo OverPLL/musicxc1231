@@ -351,9 +351,9 @@ const commands = [
 				userName = aliases[userName.toLowerCase()];
 			}
 			bot.user.setUsername(userName).then(
-					message.reply('👌 Username set!')
+					message.reply('👌 Username set!'),
 					message.delete()
-						.catch(console.error);
+						.catch(console.error)
 				)
 				.catch(err => {
 					message.reply('Error: Unable to set username');
