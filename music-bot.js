@@ -40,6 +40,7 @@ let aliases = {};
 let voiceConnection = null;
 let voiceHandler = null;
 let textChannel = null;
+let currentServerId = null;
 
 let ytApiKey = null;
 
@@ -391,6 +392,30 @@ const commands = [
 			}
 			savePlaylist(getPlaylistId(params[1]), message);
 		}
+	},
+
+	{
+		command: 'joinme',
+		description: 'Bot will join your channel',
+		parameters: [],
+		execute(message) {
+			const server = bot.guilds.get(currentServerId);
+			if (server === null) {
+				throw new Error('Couldn\'t find server ' + currentServerId);
+			}
+
+			const authorChannel = server.members.get(message.author.id).voiceChannelID;
+
+			const voiceChannel = server.channels.find(chn => chn.id === authorChannel && chn.type === 'voice'); // The voice channel the bot will connect to
+			if (voiceChannel === null) {
+				throw new Error('Couldn\'t find voice channel ' + authorChannel + ' in server');
+			}
+
+			voiceConnection = null;
+			voiceChannel.join().then(connection => {
+				voiceConnection = connection;
+			}).catch(console.error);
+		}
 	}
 
 ];
@@ -662,6 +687,7 @@ exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, to
 	autoPlaylistFilePath = autoplayPath;
 	autoPlayToggle = autoPlay;
 	adminUserId = adminUser;
+	currentServerId = serverId;
 
 	bot.on('ready', () => {
 		const server = bot.guilds.get(serverId);

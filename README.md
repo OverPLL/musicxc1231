@@ -22,6 +22,7 @@ I made it totally *ad-hoc* for my personal server so it doesn't support multiple
 - **!setavatar <image url/alias>** - Set avatar of bot.
 - **!setusername <username/alias>** - Set username of bot.
 - **!saveplaylist <playlist/alias>** - Send text file containing all video URLs in playlist to channel.
+- **!joinme** - Request the Bot to join your voice channel.
 
 # How to make it work?
 
