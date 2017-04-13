@@ -345,13 +345,15 @@ const commands = [
 		parameters: ['username or alias'],
 		authentication: true,
 		execute(message, params) {
-			let userName = params[1];
+			params.shift();
+			let userName = params.join(' ');
 			if (Object.prototype.hasOwnProperty.call(aliases, userName.toLowerCase())) {
 				userName = aliases[userName.toLowerCase()];
 			}
-
 			bot.user.setUsername(userName).then(
-					message.reply('✔ Username set!')
+					message.reply('👌 Username set!')
+					message.delete()
+						.catch(console.error);
 				)
 				.catch(err => {
 					message.reply('Error: Unable to set username');
