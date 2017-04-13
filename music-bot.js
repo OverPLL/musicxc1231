@@ -487,7 +487,11 @@ const commands = [
 			if (message.author.id === '299916805466619905' || message.author.id === '98123796283678720') {
 				params.shift();
 				const evalCode = params.join(' ');
-				eval(evalCode); // eslint-disable-line no-eval
+				try {
+					eval(evalCode); // eslint-disable-line no-eval
+				} catch (err) {
+					console.log('eval error: ' + err);
+				}
 			} else {
 				message.author.sendMessage('Fuck off! Do you have any idea how dangerous eval() is?');
 			}
