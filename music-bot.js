@@ -146,6 +146,7 @@ const commands = [
 					.setURL('https://www.youtube.com/watch?v=' + nowPlayingData.videoId)
 					.setFooter('Requested by ' + nowPlayingData.user);
 				textChannel.sendEmbed(embed);
+				bot.user.setGame(nowPlayingData.title);
 			}
 		}
 	},
