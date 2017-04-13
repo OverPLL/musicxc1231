@@ -563,7 +563,6 @@ function playNextSong() {
 			.setURL('https://www.youtube.com/watch?v=' + videoId)
 			.setFooter('Requested by ' + user);
 		textChannel.sendEmbed(embed);
-		bot.user.setGame(title);
 	}
 
 	const audioStream = ytdl('https://www.youtube.com/watch?v=' + videoId, {
@@ -571,6 +570,7 @@ function playNextSong() {
 	});
 	voiceHandler = voiceConnection.playStream(audioStream);
 	voiceHandler.setVolumeDecibels('-20');
+	bot.user.setGame(title);
 
 	voiceHandler.once('end', () => {
 		voiceHandler = null;
