@@ -138,15 +138,15 @@ const commands = [
 		command: 'np',
 		description: 'Displays the current song',
 		parameters: [],
-		execute(message) {
-			let response = 'Now playing: ';
+		execute() {
 			if (isBotPlaying()) {
-				response += '"' + nowPlayingData.title + '" (requested by ' + nowPlayingData.user + ')';
-			} else {
-				response += 'nothing!';
+				const embed = new Discord.RichEmbed()
+					.setTitle('Now playing: ' + nowPlayingData.title)
+					.setImage('https://i.ytimg.com/vi/' + nowPlayingData.videoId + '/hqdefault.jpg')
+					.setURL('https://www.youtube.com/watch?v=' + nowPlayingData.videoId)
+					.setFooter('Requested by ' + nowPlayingData.user);
+				textChannel.sendEmbed(embed);
 			}
-
-			message.reply(response);
 		}
 	},
 
