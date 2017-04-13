@@ -442,6 +442,38 @@ const commands = [
 				});
 			});
 		}
+	},
+
+	{
+		command: 'pin',
+		description: 'Pin a message',
+		parameters: ['message ID/alias'],
+		authentication: true,
+		execute(message, params) {
+			if (Object.prototype.hasOwnProperty.call(aliases, params[1].toLowerCase())) {
+				params[1] = aliases[params[1].toLowerCase()];
+			}
+			message.channel.fetchMessage(params[1]).then(result => {
+				result.pin()
+					.catch(console.error);
+			});
+		}
+	},
+
+	{
+		command: 'unpin',
+		description: 'Unpin a message',
+		parameters: ['message ID/alias'],
+		authentication: true,
+		execute(message, params) {
+			if (Object.prototype.hasOwnProperty.call(aliases, params[1].toLowerCase())) {
+				params[1] = aliases[params[1].toLowerCase()];
+			}
+			message.channel.fetchMessage(params[1]).then(result => {
+				result.unpin()
+					.catch(console.error);
+			});
+		}
 	}
 ];
 

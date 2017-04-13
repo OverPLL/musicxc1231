@@ -24,6 +24,8 @@ I made it totally *ad-hoc* for my personal server so it doesn't support multiple
 - **!saveplaylist <playlist/alias>** - Send text file containing all video URLs in playlist to channel.
 - **!joinme** - Request the Bot to join your voice channel.
 - **!purge** - Delete all unpinned messages from text channel. Limit of 100 messages.
+- **!pin <message ID/alias>** - Pin a message.
+- **!unpin <message ID/alias>** - Unpin a message.
 
 # How to make it work?
 
