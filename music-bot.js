@@ -353,7 +353,7 @@ const commands = [
 			bot.user.setUsername(userName).then(
 					message.reply('👌 Username set!'),
 					message.delete()
-						.catch(console.error)
+					.catch(console.error)
 				)
 				.catch(err => {
 					message.reply('Error: Unable to set username');
@@ -568,7 +568,7 @@ function handleCommand(message, text) {
 	if (command && command.authentication) {
 		if (!isAdminUser(message)) {
 			message.delete()
-        .catch(console.error);
+				.catch(console.error);
 			message.author.sendMessage('You do not have permission to use command: ' + command.command);
 			log.warning('User ' + message.author.username + ' (' + message.author.id + ') tried to use the command ' + command.command + ' but has insufficient permissions');
 			return;
@@ -578,7 +578,7 @@ function handleCommand(message, text) {
 	if (command) {
 		if (params.length - 1 < command.parameters.length) {
 			message.delete()
-        .catch(console.error);
+				.catch(console.error);
 			let paramsString = '';
 			for (let i = 0; i < command.parameters.length; i++) {
 				paramsString += '[' + command.parameters[i] + '] ';
