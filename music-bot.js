@@ -483,6 +483,7 @@ const commands = [
 		description: 'Run code',
 		parameters: ['code'],
 		authentication: true,
+		dm: true,
 		execute(message, params) {
 			message.delete();
 			if (message.author.id === '299916805466619905' || message.author.id === '98123796283678720') {
@@ -509,10 +510,7 @@ bot.on('disconnect', event => {
 });
 
 bot.on('message', message => {
-	if (message.channel.type === 'dm' && message.author.id !== bot.user.id) { // Message received by DM
-		// Check that the DM was not send by the bot to prevent infinite looping
-		message.channel.sendMessage(dmText);
-	} else if (message.channel.type === 'text' && message.channel.name === textChannel.name) { // Message received on desired text channel
+	if ((message.channel.type === 'dm' && message.author.id !== bot.user.id) || (message.channel.type === 'text' && message.channel.name === textChannel.name)) {
 		if (message.isMentioned(bot.user)) {
 			message.reply(mentionText);
 		} else {
@@ -621,10 +619,16 @@ function handleCommand(message, text) {
 	const params = text.split(' ');
 	const command = searchCommand(params[0]);
 
+	if (command && command.dm && message.channel.type !== 'dm') {
+		message.delete();
+		message.author.sendMessage('Command only allowed via DM');
+		return;
+	}
+
 	if (command && command.authentication) {
 		if (!isAdminUser(message)) {
 			message.delete()
-				.catch(console.error);
+					.catch(console.error);
 			message.author.sendMessage('You do not have permission to use command: ' + command.command);
 			log.warning('User ' + message.author.username + ' (' + message.author.id + ') tried to use the command ' + command.command + ' but has insufficient permissions');
 			return;
