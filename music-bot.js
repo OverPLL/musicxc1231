@@ -107,13 +107,12 @@ const commands = [
 				params[1] = aliases[params[1].toLowerCase()];
 			}
 
-			const regExp = /^.*(youtu.be\/|list=)([^#&?]*).*/;
-			const match = params[1].match(regExp);
+			const youtubeId = getYoutubeId(params[1]);
 
-			if (match && match[2]) {
-				queuePlaylist(match[2], message);
+			if (youtubeId.length === 34) {
+				queuePlaylist(youtubeId, message);
 			} else {
-				addToQueue(params[1], message);
+				addToQueue(youtubeId, message);
 			}
 		}
 	},
@@ -397,7 +396,7 @@ const commands = [
 			if (Object.prototype.hasOwnProperty.call(aliases, params[1].toLowerCase())) {
 				params[1] = aliases[params[1].toLowerCase()];
 			}
-			savePlaylist(getPlaylistId(params[1]), message);
+			savePlaylist(getYoutubeId(params[1]), message);
 		}
 	},
 
@@ -529,12 +528,10 @@ bot.on('message', message => {
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-function addToQueue(video, message, mute = false, isAutoplay = false) {
-	if (Object.prototype.hasOwnProperty.call(aliases, video.toLowerCase())) {
-		video = aliases[video.toLowerCase()];
+function addToQueue(videoId, message, mute = false, isAutoplay = false) {
+	if (Object.prototype.hasOwnProperty.call(aliases, videoId.toLowerCase())) {
+		videoId = aliases[videoId.toLowerCase()];
 	}
-
-	const videoId = getVideoId(video);
 
 	ytdl.getInfo('https://www.youtube.com/watch?v=' + videoId, (error, info) => {
 		if (error && !mute) {
@@ -739,7 +736,7 @@ function startAutoPlaylist() {
 			});
 
 			lineReader.on('line', line => {
-				addToQueue(getVideoId(line), null, true, true);
+				addToQueue(getYoutubeId(line), null, true, true);
 			});
 		}
 	});
@@ -755,22 +752,14 @@ function isAdminUser(message) {
 	// /////////////////////////////////////////////////////////////////////////////////////////////////
 	// /////////////////////////////////////////////////////////////////////////////////////////////////
 
-function getVideoId(string) {
-	const regex = /(?:\?v=|&v=|youtu\.be\/)(.*?)(?:\?|&|$)/;
-	const matches = string.match(regex);
+function getYoutubeId(string) {
+	const regex = /^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?.*?(?:v|list)=(.*?)(?:&|$)|^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?(?:(?!=).)*\/(.*)$/gm;
+	const matches = regex.exec(string);
 
-	if (matches) {
-		return matches[1];
-	}
-	return string;
-}
-
-function getPlaylistId(string) {
-	const regex = /^.*(youtu.be\/|list=)([^#&?]*).*/;
-	const matches = string.match(regex);
-
-	if (matches) {
+	if (matches && matches[2]) {
 		return matches[2];
+	} else if (matches) {
+		return matches[1];
 	}
 	return string;
 }
