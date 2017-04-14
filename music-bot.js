@@ -526,7 +526,7 @@ bot.on('message', message => {
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-function addToQueue(video, message, mute = false) {
+function addToQueue(video, message, mute = false, isAutoplay = false) {
 	if (Object.prototype.hasOwnProperty.call(aliases, video.toLowerCase())) {
 		video = aliases[video.toLowerCase()];
 	}
@@ -539,17 +539,23 @@ function addToQueue(video, message, mute = false) {
 			console.log('Error (' + videoId + '): ' + error);
 		} else {
 			if (typeof info !== 'undefined') {
-				if (message) {
-					queue.push({
-						title: info.title,
-						id: videoId,
-						user: message.author.username
-					});
-				} else {
+				if (isAutoplay) {
 					queue.push({
 						title: info.title,
 						id: videoId,
 						user: 'AutoPlay'
+					});
+				} else if (nowPlayingData.user === 'AutoPlay') {
+					queue = [{
+						title: info.title,
+						id: videoId,
+						user: message.author.username
+					}].concat(queue);
+				} else {
+					queue.push({
+						title: info.title,
+						id: videoId,
+						user: message.author.username
 					});
 				}
 			}
@@ -730,7 +736,7 @@ function startAutoPlaylist() {
 			});
 
 			lineReader.on('line', line => {
-				addToQueue(getVideoId(line), null, true);
+				addToQueue(getVideoId(line), null, true, true);
 			});
 		}
 	});
