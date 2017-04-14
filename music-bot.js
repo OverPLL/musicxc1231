@@ -41,6 +41,7 @@ let voiceConnection = null;
 let voiceHandler = null;
 let textChannel = null;
 let currentServerId = null;
+let playlistQueued = '';
 
 let ytApiKey = null;
 
@@ -676,8 +677,10 @@ function queuePlaylist(playlistId, message, pageToken = '') {
 		} else {
 			for (let i = 0; i < json.items.length; i++) {
 				addToQueue(json.items[i].snippet.resourceId.videoId, message, true);
+				playlistQueued++;
 			}
 			if (typeof json.nextPageToken === 'undefined') {
+				message.reply('👌 Queued playlist (' + playlistId + ') successfully! ' + playlistQueued + ' videos added. 🔥🔥🔥');
 				return;
 			}
 			queuePlaylist(playlistId, message, json.nextPageToken);
