@@ -183,6 +183,9 @@ const commands = [
 
 			for (let i = 0; i < commands.length; i++) {
 				const c = commands[i];
+				if (c.authentication && !isAdminUser(message)) {
+					continue;
+				}
 				response += '\n!' + c.command;
 
 				for (let j = 0; j < c.parameters.length; j++) {
