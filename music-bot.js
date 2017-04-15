@@ -40,6 +40,7 @@ let aliases = {};
 let voiceConnection = null;
 let voiceHandler = null;
 let textChannel = null;
+let voiceChannel = null;
 let currentServerId = null;
 let playlistQueued = '';
 let homeVoiceChannel = null;
@@ -417,7 +418,7 @@ const commands = [
 
 			const authorChannel = server.members.get(message.author.id).voiceChannelID;
 
-			const voiceChannel = server.channels.find(chn => chn.id === authorChannel && chn.type === 'voice'); // The voice channel the bot will connect to
+			voiceChannel = server.channels.find(chn => chn.id === authorChannel && chn.type === 'voice'); // The voice channel the bot will connect to
 			if (voiceChannel === null) {
 				throw new Error('Couldn\'t find voice channel ' + authorChannel + ' in server');
 			}
@@ -520,7 +521,7 @@ const commands = [
 				throw new Error('Couldn\'t find server ' + currentServerId);
 			}
 
-			const voiceChannel = server.channels.find(chn => chn.id === homeVoiceChannel && chn.type === 'voice');
+			voiceChannel = server.channels.find(chn => chn.id === homeVoiceChannel && chn.type === 'voice');
 			voiceChannel.join();
 		}
 	},
@@ -634,7 +635,16 @@ function playNextSong() {
 	voiceHandler.setVolumeDecibels('-20');
 	bot.user.setGame(title);
 
-	voiceHandler.once('end', () => {
+	voiceHandler.on('debug', information => {
+		console.log('Stream Debug: ' + information);
+	});
+
+	voiceHandler.once('error', err => {
+		console.log('Stream Error: ' + err);
+	});
+
+	voiceHandler.once('end', reason => {
+		console.log('Playback ended, reason: ' + reason);
 		voiceHandler = null;
 		bot.user.setGame();
 		if (!stopped && !isQueueEmpty()) {
@@ -818,7 +828,7 @@ exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, to
 			throw new Error('Couldn\'t find server ' + serverId);
 		}
 
-		const voiceChannel = server.channels.find(chn => chn.id === voiceChannelId && chn.type === 'voice'); // The voice channel the bot will connect to
+		voiceChannel = server.channels.find(chn => chn.id === voiceChannelId && chn.type === 'voice'); // The voice channel the bot will connect to
 		if (voiceChannel === null) {
 			throw new Error('Couldn\'t find voice channel ' + voiceChannelId + ' in server ' + serverId);
 		}
@@ -860,6 +870,14 @@ exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, to
 
 	bot.login(token);
 };
+
+bot.on('voiceStateUpdate', () => {
+	if (voiceChannel.members.array().length < 2 && voiceHandler) {
+		voiceHandler.pause();
+	} else if (voiceChannel.members.array().length >= 2 && voiceHandler) {
+		voiceHandler.resume();
+	}
+});
 
 exports.setYoutubeKey = function (key) {
 	ytApiKey = key;

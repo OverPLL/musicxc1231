@@ -1,8 +1,6 @@
-<p align="center"><a href="https://nodei.co/npm/discord-music-bot/"><img src="https://nodei.co/npm/discord-music-bot.png"></a></p>
-
 A Node.JS Discord bot that takes song requests from videos on YouTube, queues them and plays the audio of said videos on a voice channel.
 
-I made it totally *ad-hoc* for my personal server so it doesn't support multiple servers for a single instance or anything like that, but it can be customised very easily to make it work on any server you want.
+I forked it from [agubelu/discord-music-bot](https://github.com/agubelu/discord-music-bot) for my personal server adding functionality and changes some existing. I send [PRs](https://github.com/agubelu/discord-music-bot/commits?author=SavageCore) back sometimes.
 
 # Available commands
 - **!request <video/playlist/alias>** - Adds a YouTube video or playlist to the queue. You can provide the full URL, just the video ID, full playlist URL or an alias.
@@ -56,9 +54,11 @@ bot.run(serverId, textChannelId, voiceChannelId, aliasesFile, botToken, autoplay
 ```
 The aliases and autoplay file parameters can be just a filename or a path to a file. If it does not exist, it will be generated. If you provide a filename, it will be generated in the same folder as the previous script. Any filename will do.
 
-The bot will join the voice channel that you configured when it connects to the server, but obviously you can move it to other voice channels once it joins. The text channel is the one the bot will use to listen to commands and announce stuff. Keep in mind that all names are case-sensitive!
+The bot will join the voice channel that you configured when it connects to the server, but obviously you can move it to other voice channels once it joins or use the `!joinme` command to have the bot join you! The text channel is the one the bot will use to listen to commands and announce stuff.
 
 Save it with whatever name you want (for instance, "bot.js") and then execute it using Node.JS: `node bot.js`. Your bot should now be up and running in your server!
+
+Playback will pause if no clients are in the voice channel.
 
 # Obtaining a YouTube API key
 In order to use the !search command, you must provide the bot with a YouTube API key of your own. The process is quite simple:
