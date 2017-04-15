@@ -34,6 +34,7 @@ var aliases = {};
 var voice_connection = null;
 var voice_handler = null;
 var text_channel = null;
+var voice_channel = null;
 
 var yt_api_key = null;
 
@@ -514,7 +515,7 @@ exports.run = function(server_name, text_channel_name, voice_channel_name, alias
 		var server = bot.guilds.find("name", server_name);
 		if(server === null) throw "Couldn't find server '" + server_name + "'";
 
-		var voice_channel = server.channels.find(chn => chn.name === voice_channel_name && chn.type === "voice"); //The voice channel the bot will connect to
+		voice_channel = server.channels.find(chn => chn.name === voice_channel_name && chn.type === "voice"); //The voice channel the bot will connect to
 		if(voice_channel === null) throw "Couldn't find voice channel '" + voice_channel_name + "' in server '" + server_name + "'";
 		
 		text_channel = server.channels.find(chn => chn.name === text_channel_name && chn.type === "text"); //The text channel the bot will use to announce stuff
@@ -540,6 +541,16 @@ exports.run = function(server_name, text_channel_name, voice_channel_name, alias
 
 	bot.login(token);
 }
+
+bot.on("voiceStateUpdate", () => {
+	if (voice_channel.members.array().length < 2 && voice_handler) {
+		voice_handler.pause();
+		bot.user.setGame(now_playing_data.title + ' (Paused)');
+	} else if (voice_channel.members.array().length >= 2 && voice_handler) {
+		voice_handler.resume();
+		bot.user.setGame(now_playing_data.title);
+	}
+});
 
 exports.setYoutubeKey = function(key) {
 	yt_api_key = key;
