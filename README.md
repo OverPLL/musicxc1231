@@ -80,13 +80,4 @@ To get user IDs turn on Developer Mode in the Discord client (`User Settings` ->
 
 Any command with `authentication: true` set will require issuing user to be in adminUsers array.
 
-The current commands locked to admins are:
-
-* setnp
-* clearqueue
-* remove
-* setalias
-* deletealias
-* setavatar
-* setusername
-* setautoplay
+!commands returns viable commands for a given user.
