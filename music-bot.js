@@ -96,8 +96,9 @@ const commands = [
 					playNextSong();
 				}
 			} else if (paused) {
-				paused = false;
 				voiceHandler.resume();
+				paused = false;
+				bot.user.setGame(nowPlayingData.title);
 			} else {
 				message.reply('Playback is already running');
 			}
@@ -535,6 +536,7 @@ const commands = [
 			message.delete();
 			voiceHandler.pause();
 			paused = true;
+			bot.user.setGame(nowPlayingData.title + ' (Paused)');
 		}
 	}
 ];
