@@ -26,6 +26,8 @@ I made it totally *ad-hoc* for my personal server so it doesn't support multiple
 - **!purge** - Delete all unpinned messages from text channel. Limit of 100 messages.
 - **!pin <message ID/alias>** - Pin a message.
 - **!unpin <message ID/alias>** - Unpin a message.
+- **!home** - Return bot to initial voice channel.
+- **!pause** - Pause playback.
 
 # How to make it work?
 

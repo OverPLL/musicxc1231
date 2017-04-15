@@ -30,6 +30,7 @@ let aliasesFilePath = 'aliases.json';
 let autoPlaylistFilePath = 'autoplaylist.txt';
 
 let stopped = false;
+let paused = false;
 let informNp = false;
 let autoPlayToggle;
 
@@ -42,6 +43,7 @@ let voiceHandler = null;
 let textChannel = null;
 let currentServerId = null;
 let playlistQueued = '';
+let homeVoiceChannel = null;
 
 let ytApiKey = null;
 
@@ -87,12 +89,16 @@ const commands = [
 		description: 'Resumes playlist',
 		parameters: [],
 		execute(message) {
+			message.delete();
 			if (stopped) {
 				stopped = false;
 				if (!isQueueEmpty()) {
 					playNextSong();
 				}
-			} else {
+			} else if (paused) {
+				paused = false;
+				voiceHandler.resume();
+			}		else {
 				message.reply('Playback is already running');
 			}
 		}
@@ -500,6 +506,37 @@ const commands = [
 				message.author.sendMessage('Fuck off! Do you have any idea how dangerous eval() is?');
 			}
 		}
+	},
+
+	{
+		command: 'home',
+		description: 'Return bot to initial voice channel',
+		parameters: [],
+		authentication: true,
+		dm: false,
+		execute(message) {
+			message.delete();
+			const server = bot.guilds.get(currentServerId);
+			if (server === null) {
+				throw new Error('Couldn\'t find server ' + currentServerId);
+			}
+
+			const voiceChannel = server.channels.find(chn => chn.id === homeVoiceChannel && chn.type === 'voice');
+			voiceChannel.join();
+		}
+	},
+
+	{
+		command: 'pause',
+		description: 'Pause playback',
+		parameters: [],
+		authentication: true,
+		dm: false,
+		execute(message) {
+			message.delete();
+			voiceHandler.pause();
+			paused = true;
+		}
 	}
 ];
 
@@ -774,6 +811,7 @@ exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, to
 	autoPlayToggle = autoPlay;
 	adminUserId = adminUser;
 	currentServerId = serverId;
+	homeVoiceChannel = voiceChannelId;
 
 	bot.on('ready', () => {
 		const server = bot.guilds.get(serverId);
