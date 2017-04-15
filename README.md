@@ -24,6 +24,7 @@ I made it totally *ad-hoc* for my personal server so it doesn't support multiple
 - **!aliases** - Displays the stored aliases.
 - **!setavatar <image url/alias>** - Set avatar of bot.
 - **!setusername <username/alias>** - Set username of bot.
+- **!pause** - Pause playback.
 
 # How to make it work?
 

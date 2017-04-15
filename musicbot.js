@@ -25,6 +25,7 @@ const mention_text = "Use !commands to see the command list.";
 var aliases_file_path = "aliases.json";
 
 var stopped = false;
+var paused = false;
 var inform_np = true;
 
 var now_playing_data = {};
@@ -70,6 +71,10 @@ var commands = [
 				if(!is_queue_empty()) {
 					play_next_song();
 				}
+			} else if(paused) {
+				voice_handler.resume();
+				paused = false;
+				bot.user.setGame(now_playing_data.title);
 			} else {
 				message.reply("Playback is already running");
 			}
@@ -337,7 +342,18 @@ var commands = [
 				console.log('Error on setavatar command:', err); 
       });
 		}
-  }
+  },
+
+	{
+		command: "pause",
+		description: "Pause playback",
+		parameters: [],
+		execute: function (message) {
+			voice_handler.pause();
+			bot.user.setGame(now_playing_data.title + " (Paused)");
+			paused = true;
+		}
+	}
 
 ];
 
