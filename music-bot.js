@@ -445,7 +445,6 @@ const commands = [
 				result.every(result => {
 					if (!result.pinned) {
 						result.delete()
-							.then(console.log('Deleted ' + result.id))
 							.catch(console.error);
 					}
 					return true;
@@ -862,7 +861,7 @@ exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, to
 
 		bot.user.setGame();
 
-		console.log('Connected!');
+		console.log('Bot has started and is connected!');
 		if (autoPlay) {
 			startAutoPlaylist();
 		}
