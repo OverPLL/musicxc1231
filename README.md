@@ -60,6 +60,8 @@ Save it with whatever name you want (for instance, "bot.js") and then execute it
 
 Playback will pause if no clients are in the voice channel.
 
+Any songs/playlists queued with `!request` or `!search` during playback of autoplay song will be added to the front of the queue.
+
 # Obtaining a YouTube API key
 In order to use the !search command, you must provide the bot with a YouTube API key of your own. The process is quite simple:
 
