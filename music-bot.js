@@ -874,8 +874,10 @@ exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, to
 bot.on('voiceStateUpdate', () => {
 	if (voiceChannel.members.array().length < 2 && voiceHandler) {
 		voiceHandler.pause();
+		bot.user.setGame(nowPlayingData.title + ' (Paused)');
 	} else if (voiceChannel.members.array().length >= 2 && voiceHandler) {
 		voiceHandler.resume();
+		bot.user.setGame(nowPlayingData.title);
 	}
 });
 
