@@ -80,4 +80,4 @@ To get user IDs turn on Developer Mode in the Discord client (`User Settings` ->
 
 Any command with `authentication: true` set will require issuing user to be in adminUsers array.
 
-!commands returns viable commands for a given user.
+`!commands` returns viable commands for a given user.
