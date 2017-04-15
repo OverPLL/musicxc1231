@@ -24,7 +24,6 @@ const bot = new Discord.Client({
 	max_message_cache: 0 // eslint-disable-line camelcase
 });
 
-const dmText = 'Hey there! Use !commands on a public chat room to see the command list.';
 const mentionText = 'Use !commands to see the command list.';
 let aliasesFilePath = 'aliases.json';
 let autoPlaylistFilePath = 'autoplaylist.txt';
