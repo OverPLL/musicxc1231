@@ -18,6 +18,7 @@ const Discord = require('discord.js');
 const ytdl = require('ytdl-core');
 const request = require('request');
 const Loggerr = require('loggerr');
+const clearRequire = require('clear-require');
 
 const bot = new Discord.Client({
 	autoReconnect: true,
@@ -47,7 +48,7 @@ let homeVoiceChannel = null;
 
 let ytApiKey = null;
 
-let adminUserId;
+let permissions;
 
 const logfile = fs.createWriteStream('./log', {
 	flags: 'a',
@@ -162,7 +163,6 @@ const commands = [
 		command: 'setnp',
 		description: 'Sets whether the bot will announce the current song or not',
 		parameters: ['on/off'],
-		authentication: true,
 		execute(message, params) {
 			let response;
 			if (params[1].toLowerCase() === 'on') {
@@ -199,7 +199,7 @@ const commands = [
 			});
 			for (let i = 0; i < commands.length; i++) {
 				const c = commands[i];
-				if (c.authentication && !isAdminUser(message)) {
+				if (!permissions.checkPermission(message.author.id, c.command)) {
 					continue;
 				}
 				response += '\n!' + c.command;
@@ -252,7 +252,6 @@ const commands = [
 		command: 'clearqueue',
 		description: 'Removes all songs from the queue',
 		parameters: [],
-		authentication: true,
 		execute(message) {
 			queue = [];
 			message.reply('Queue has been cleared!');
@@ -263,7 +262,6 @@ const commands = [
 		command: 'remove',
 		description: 'Removes a song from the queue',
 		parameters: ['Request index or \'last\''],
-		authentication: true,
 		execute(message, params) {
 			let index = params[1];
 
@@ -310,7 +308,6 @@ const commands = [
 		command: 'setalias',
 		description: 'Sets an alias, overriding the previous one if it already exists',
 		parameters: ['alias', 'video URL or ID'],
-		authentication: true,
 		execute(message, params) {
 			const alias = params[1].toLowerCase();
 			const val = params[2];
@@ -326,7 +323,6 @@ const commands = [
 		command: 'deletealias',
 		description: 'Deletes an existing alias',
 		parameters: ['alias'],
-		authentication: true,
 		execute(message, params) {
 			const alias = params[1].toLowerCase();
 			if (Object.prototype.hasOwnProperty.call(aliases, alias)) {
@@ -343,7 +339,6 @@ const commands = [
 		command: 'setavatar',
 		description: 'Set bot avatar, overriding the previous one if it already exists',
 		parameters: ['Image URL or alias'],
-		authentication: true,
 		execute(message, params) {
 			let url = params[1];
 			if (Object.prototype.hasOwnProperty.call(aliases, url.toLowerCase())) {
@@ -364,7 +359,6 @@ const commands = [
 		command: 'setusername',
 		description: 'Set username of bot',
 		parameters: ['username or alias'],
-		authentication: true,
 		execute(message, params) {
 			params.shift();
 			let userName = params.join(' ');
@@ -387,7 +381,6 @@ const commands = [
 		command: 'setautoplay',
 		description: 'Sets whether the bot will autoplay from ' + autoPlaylistFilePath + ' or not.',
 		parameters: ['on/off'],
-		authentication: true,
 		execute(message, params) {
 			let response;
 			if (params[1].toLowerCase() === 'on') {
@@ -447,7 +440,6 @@ const commands = [
 		command: 'purge',
 		description: 'Delete all unpinned messages from text channel',
 		parameters: [],
-		authentication: true,
 		execute(message) {
 			message.channel.fetchMessages({
 				limit: 100
@@ -467,7 +459,6 @@ const commands = [
 		command: 'pin',
 		description: 'Pin a message',
 		parameters: ['message ID/alias'],
-		authentication: true,
 		execute(message, params) {
 			if (Object.prototype.hasOwnProperty.call(aliases, params[1].toLowerCase())) {
 				params[1] = aliases[params[1].toLowerCase()];
@@ -483,7 +474,6 @@ const commands = [
 		command: 'unpin',
 		description: 'Unpin a message',
 		parameters: ['message ID/alias'],
-		authentication: true,
 		execute(message, params) {
 			if (Object.prototype.hasOwnProperty.call(aliases, params[1].toLowerCase())) {
 				params[1] = aliases[params[1].toLowerCase()];
@@ -499,7 +489,6 @@ const commands = [
 		command: 'eval',
 		description: 'Run code',
 		parameters: ['code'],
-		authentication: true,
 		dm: true,
 		execute(message, params) {
 			message.delete();
@@ -521,8 +510,6 @@ const commands = [
 		command: 'home',
 		description: 'Return bot to initial voice channel',
 		parameters: [],
-		authentication: true,
-		dm: false,
 		execute(message) {
 			message.delete();
 			const server = bot.guilds.get(currentServerId);
@@ -539,13 +526,23 @@ const commands = [
 		command: 'pause',
 		description: 'Pause playback',
 		parameters: [],
-		authentication: true,
 		dm: false,
 		execute(message) {
 			message.delete();
 			voiceHandler.pause();
 			paused = true;
 			bot.user.setGame(nowPlayingData.title + ' (Paused)');
+		}
+	},
+
+	{
+		command: 'reload',
+		description: 'Reload bot',
+		parameters: [],
+		execute(message) {
+			message.delete();
+			permissions = loadPermissions();
+			message.reply('👌 Bot reloaded');
 		}
 	}
 ];
@@ -692,14 +689,12 @@ function handleCommand(message, text) {
 		return;
 	}
 
-	if (command && command.authentication) {
-		if (!isAdminUser(message)) {
-			message.delete()
-				.catch(console.error);
-			message.author.sendMessage('You do not have permission to use command: ' + command.command);
-			log.warning('User ' + message.author.username + ' (' + message.author.id + ') tried to use the command ' + command.command + ' but has insufficient permissions');
-			return;
-		}
+	if (!permissions.checkPermission(message.author.id, command.command)) {
+		message.delete()
+			.catch(console.error);
+		message.channel.sendMessage(message.author.username + ' doesn\'t have permission to execute ' + command.command + '!');
+		log.warning('User ' + message.author.username + ' (' + message.author.id + ') tried to use the command ' + command.command + ' but has insufficient permissions');
+		return;
 	}
 
 	if (command) {
@@ -803,12 +798,6 @@ function startAutoPlaylist() {
 	});
 }
 
-function isAdminUser(message) {
-	if (adminUserId.indexOf(message.author.id) !== -1) {
-		return true;
-	}
-	return false;
-}
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -848,15 +837,49 @@ function toHHMMSS(input) {
 	return time;
 }
 
+function loadPermissions() {
+	try {
+		clearRequire('./permissions.json');
+		permissions = require('./permissions.json');
+	} catch (err) {
+		permissions.global = {};
+		permissions.users = {};
+	}
+
+	permissions.checkPermission = function (userId, permission) {
+		try {
+			let allowed = true;
+			try {
+				if (Object.prototype.hasOwnProperty.call(permissions.global, permission)) {
+					allowed = permissions.global[permission] === true;
+				}
+			} catch (err) {
+				console.log(err);
+			}
+			try {
+				if (Object.prototype.hasOwnProperty.call(permissions.users[userId], permission)) {
+					allowed = permissions.users[userId][permission] === true;
+				}
+			} catch (err) {
+				console.log(err);
+			}
+			return allowed;
+		} catch (err) {
+			console.log(err);
+		}
+		return false;
+	};
+	return permissions;
+}
+
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, token, autoplayPath, autoPlay, adminUser) { // eslint-disable-line max-params
+exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, token, autoplayPath, autoPlay) { // eslint-disable-line max-params
 	aliasesFilePath = aliasesPath;
 	autoPlaylistFilePath = autoplayPath;
 	autoPlayToggle = autoPlay;
-	adminUserId = adminUser;
 	currentServerId = serverId;
 	homeVoiceChannel = voiceChannelId;
 
@@ -897,6 +920,8 @@ exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, to
 				fs.closeSync(fs.openSync(autoPlaylistFilePath, 'w'));
 			}
 		});
+
+		permissions = loadPermissions();
 
 		bot.user.setGame();
 
