@@ -148,7 +148,7 @@ const commands = [
 		execute() {
 			if (isBotPlaying()) {
 				const embed = new Discord.RichEmbed()
-					.setTitle('Now playing: ' + nowPlayingData.title)
+					.setTitle('Now playing: ' + nowPlayingData.title + ' (' + toHHMMSS(nowPlayingData.duration) + ')')
 					.setImage('https://i.ytimg.com/vi/' + nowPlayingData.videoId + '/hqdefault.jpg')
 					.setURL('https://www.youtube.com/watch?v=' + nowPlayingData.videoId)
 					.setFooter('Requested by ' + nowPlayingData.user);
@@ -416,7 +416,6 @@ const commands = [
 			if (server === null) {
 				throw new Error('Couldn\'t find server ' + currentServerId);
 			}
-
 			const authorChannel = server.members.get(message.author.id).voiceChannelID;
 
 			voiceChannel = server.channels.find(chn => chn.id === authorChannel && chn.type === 'voice'); // The voice channel the bot will connect to
@@ -581,24 +580,27 @@ function addToQueue(videoId, message, mute = false, isAutoplay = false) {
 					queue.push({
 						title: info.title,
 						id: videoId,
+						duration: info.length_seconds,
 						user: 'AutoPlay'
 					});
 				} else if (nowPlayingData.user === 'AutoPlay') {
 					queue = [{
 						title: info.title,
 						id: videoId,
+						duration: info.length_seconds,
 						user: message.author.username
 					}].concat(queue);
 				} else {
 					queue.push({
 						title: info.title,
 						id: videoId,
+						duration: info.length_seconds,
 						user: message.author.username
 					});
 				}
 			}
 			if (!mute) {
-				message.reply('"' + info.title + '" has been added to the queue.');
+				message.reply('**' + info.title + '** (' + toHHMMSS(info.length_seconds) + ') has been added to the queue.');
 			}
 			if (!stopped && !isBotPlaying() && queue.length === 1) {
 				playNextSong();
@@ -615,10 +617,12 @@ function playNextSong() {
 	const videoId = queue[0].id;
 	const title = queue[0].title;
 	const user = queue[0].user;
+	const duration = queue[0].duration;
 
 	nowPlayingData.title = title;
 	nowPlayingData.user = user;
 	nowPlayingData.videoId = videoId;
+	nowPlayingData.duration = duration;
 
 	if (informNp) {
 		const embed = new Discord.RichEmbed()
@@ -809,6 +813,29 @@ function getYoutubeId(string) {
 		return matches[1];
 	}
 	return string;
+}
+
+function toHHMMSS(input) {
+	const secNum = parseInt(input, 10); // Don't forget the second param
+	let hours = Math.floor(secNum / 3600);
+	let minutes = Math.floor((secNum - (hours * 3600)) / 60);
+	let seconds = secNum - (hours * 3600) - (minutes * 60);
+
+	let hourSeparator = ':';
+	const minuteSeparator = ':';
+
+	if (hours === 0) {
+		hours = '';
+		hourSeparator = '';
+	}
+	if (minutes < 10 && hours !== 0) {
+		minutes = '0' + minutes;
+	}
+	if (seconds < 10) {
+		seconds = '0' + seconds;
+	}
+	const time = hours + hourSeparator + minutes + minuteSeparator + seconds;
+	return time;
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
