@@ -3,29 +3,32 @@ A Node.JS Discord bot that takes song requests from videos on YouTube, queues th
 I forked it from [agubelu/discord-music-bot](https://github.com/agubelu/discord-music-bot) for my personal server adding functionality and changes some existing. I send [PRs](https://github.com/agubelu/discord-music-bot/commits?author=SavageCore) back sometimes.
 
 # Available commands
-- **!request <video/playlist/alias>** - Adds a YouTube video or playlist to the queue. You can provide the full URL, just the video ID, full playlist URL or an alias.
-- **!search <query>** - Searches for a video on YouTube and adds it to the queue. Requires a [YouTube API key](#obtaining-a-youtube-api-key).
-- **!stop** - Stops the playback, the bot will not continue with the pending queue until !resume is issued.
-- **!resume** - Allows the bot to play videos from the queue again after !stop was issued.
-- **!np** - Displays the title of the video that is being played.
-- **!setnp <on/off>** - Selects whether the bot will announce the title of the video it's about to play or not.
-- **!commands** - Displays all available commands, pretty much like this.
-- **!skip** - Skips the video that is being currently played.
-- **!queue** - Displays the queue.
-- **!clearqueue** - Sets the queue to an empty state, discarding all pending requests.
-- **!remove <request index or 'last'>** - Removes a specific request from the queue. `!remove last` will delete the last request that was added.
-- **!setalias <alias> <video>**: Maps any word of your choice (*alias*) to a video URL or ID, so you can !request the alias instead.
-- **!deletealias <alias>** - Removes an existing alias.
 - **!aliases** - Displays the stored aliases.
-- **!setavatar <image url/alias>** - Set avatar of bot.
-- **!setusername <username/alias>** - Set username of bot.
-- **!saveplaylist <playlist/alias>** - Send text file containing all video URLs in playlist to channel.
-- **!joinme** - Request the Bot to join your voice channel.
-- **!purge** - Delete all unpinned messages from text channel. Limit of 100 messages.
-- **!pin <message ID/alias>** - Pin a message.
-- **!unpin <message ID/alias>** - Unpin a message.
+- **!clearqueue** - Sets the queue to an empty state, discarding all pending requests.
+- **!commands** - Displays all available commands, pretty much like this.
+- **!deletealias <alias>** - Removes an existing alias.
+- **!eval <code>** - Run code.
 - **!home** - Return bot to initial voice channel.
+- **!joinme** - Request the Bot to join your voice channel.
+- **!np** - Displays the title of the video that is being played.
 - **!pause** - Pause playback.
+- **!pin <message ID/alias>** - Pin a message.
+- **!purge** - Delete all unpinned messages from text channel. Limit of 100 messages.
+- **!queue** - Displays the queue.
+- **!reload** - Reload bot.
+- **!remove <request index or 'last'>** - Removes a specific request from the queue. `!remove last` will delete the last request that was added.
+- **!request <video/playlist/alias>** - Adds a YouTube video or playlist to the queue. You can provide the full URL, just the video ID, full playlist URL or an alias.
+- **!resume** - Allows the bot to play videos from the queue again after !stop was issued.
+- **!saveplaylist <playlist/alias>** - Send text file containing all video URLs in playlist to channel.
+- **!search <query>** - Searches for a video on YouTube and adds it to the queue. Requires a [YouTube API key](#obtaining-a-youtube-api-key).
+- **!setalias <alias> <video>**: Maps any word of your choice (*alias*) to a video URL or ID, so you can !request the alias instead.
+- **!setautoplay <on/off>**: Sets whether the bot will autoplay from autoplayFile or not.
+- **!setavatar <image url/alias>** - Set avatar of bot.
+- **!setnp <on/off>** - Selects whether the bot will announce the title of the video it's about to play or not.
+- **!setusername <username/alias>** - Set username of bot.
+- **!skip** - Skips the video that is being currently played.
+- **!stop** - Stops the playback, the bot will not continue with the pending queue until !resume is issued.
+- **!unpin <message ID/alias>** - Unpin a message.
 
 # How to make it work?
 
