@@ -7,7 +7,7 @@ I forked it from [agubelu/discord-music-bot](https://github.com/agubelu/discord-
 - **!clearqueue** - Sets the queue to an empty state, discarding all pending requests.
 - **!commands** - Displays all available commands, pretty much like this.
 - **!deletealias <alias>** - Removes an existing alias.
-- **!eval <code>** - Run code.
+- **!eval \<code>** - Run code.
 - **!home** - Return bot to initial voice channel.
 - **!joinme** - Request the Bot to join your voice channel.
 - **!np** - Displays the title of the video that is being played.
