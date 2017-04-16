@@ -186,7 +186,17 @@ const commands = [
 		parameters: [],
 		execute(message) {
 			let response = 'Available commands:';
-
+			commands.sort((a, b) => {
+				const commandA = a.command.toUpperCase();
+				const commandB = b.command.toUpperCase();
+				if (commandA < commandB) {
+					return -1;
+				}
+				if (commandA > commandB) {
+					return 1;
+				}
+				return 0;
+			});
 			for (let i = 0; i < commands.length; i++) {
 				const c = commands[i];
 				if (c.authentication && !isAdminUser(message)) {
