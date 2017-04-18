@@ -23,7 +23,9 @@
   "dependencies": {
     "clear-require": "^2.0.0",
     "discord.js": "^11.0.0",
+    "isstream": "^0.1.2",
     "loggerr": "^1.7.0",
+    "node-bandcamp": "0.0.6",
     "node-opus": "^0.2.4",
     "request": "^2.79.0",
     "ytdl-core": "^0.7.21"

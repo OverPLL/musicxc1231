@@ -19,6 +19,8 @@ const ytdl = require('ytdl-core');
 const request = require('request');
 const Loggerr = require('loggerr');
 const clearRequire = require('clear-require');
+const bandcamp = require('node-bandcamp');
+const isStream = require('isstream');
 
 const bot = new Discord.Client({
 	autoReconnect: true,
@@ -113,6 +115,11 @@ const commands = [
 		execute(message, params) {
 			if (Object.prototype.hasOwnProperty.call(aliases, params[1].toLowerCase())) {
 				params[1] = aliases[params[1].toLowerCase()];
+			}
+
+			if (params[1].indexOf('bandcamp.com') !== -1) {
+				addToQueue(params[1], message);
+				return;
 			}
 
 			const youtubeId = getYoutubeId(params[1]);
@@ -577,6 +584,33 @@ function addToQueue(videoId, message, mute = false, isAutoplay = false) {
 		videoId = aliases[videoId.toLowerCase()];
 	}
 
+	if (videoId.indexOf('bandcamp.com') !== -1) {
+		bandcamp.getDetails(videoId).then(details => {
+			if (nowPlayingData.user === 'AutoPlay') {
+				queue = [{
+					title: details.artist + ' - ' + details.title,
+					id: videoId,
+					user: message.author.username
+				}].concat(queue);
+			} else {
+				queue.push({
+					title: details.artist + ' - ' + details.title,
+					id: videoId,
+					user: message.author.username
+				});
+			}
+			if (!mute) {
+				message.reply('**' + details.artist + ' - ' + details.title + '** has been added to the queue.');
+			}
+			if (!stopped && !isBotPlaying() && queue.length === 1) {
+				playNextSong();
+			}
+		}).catch(err => {
+			console.log(err);
+		});
+		return;
+	}
+
 	ytdl.getInfo('https://www.youtube.com/watch?v=' + videoId, (error, info) => {
 		if (error && !mute) {
 			message.reply('The requested video (' + videoId + ') does not exist or cannot be played.');
@@ -624,47 +658,84 @@ function playNextSong() {
 	const videoId = queue[0].id;
 	const title = queue[0].title;
 	const user = queue[0].user;
-	const duration = queue[0].duration;
+	if (queue[0].duration) {
+		const duration = queue[0].duration;
+		nowPlayingData.duration = duration;
+	}
 
 	nowPlayingData.title = title;
 	nowPlayingData.user = user;
 	nowPlayingData.videoId = videoId;
-	nowPlayingData.duration = duration;
 
-	if (informNp) {
-		const embed = new Discord.RichEmbed()
-			.setTitle('Now playing: ' + title)
-			.setImage('https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg')
-			.setURL('https://www.youtube.com/watch?v=' + videoId)
-			.setFooter('Requested by ' + user);
-		textChannel.sendEmbed(embed);
-	}
-
-	const audioStream = ytdl('https://www.youtube.com/watch?v=' + videoId, {
-		filter: 'audioonly'
-	});
-	voiceHandler = voiceConnection.playStream(audioStream);
-	voiceHandler.setVolumeDecibels('-20');
-	bot.user.setGame(title);
-
-	voiceHandler.on('debug', information => {
-		console.log('Stream Debug: ' + information);
-	});
-
-	voiceHandler.once('error', err => {
-		console.log('Stream Error: ' + err);
-	});
-
-	voiceHandler.once('end', reason => {
-		console.log('Playback ended, reason: ' + reason);
-		voiceHandler = null;
-		bot.user.setGame();
-		if (!stopped && !isQueueEmpty()) {
-			playNextSong();
-		} else if (autoPlayToggle) {
-			startAutoPlaylist();
+	if (videoId.indexOf('bandcamp.com') === -1) {
+		const audioStream = ytdl('https://www.youtube.com/watch?v=' + videoId, {
+			filter: 'audioonly'
+		});
+		voiceHandler = voiceConnection.playStream(audioStream);
+		voiceHandler.setVolumeDecibels('-20');
+		if (informNp) {
+			const embed = new Discord.RichEmbed()
+				.setTitle('Now playing: ' + title)
+				.setImage('https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg')
+				.setURL('https://www.youtube.com/watch?v=' + videoId)
+				.setFooter('Requested by ' + user);
+			textChannel.sendEmbed(embed);
 		}
-	});
+		voiceHandler.on('debug', information => {
+			console.log('Stream Debug: ' + information);
+		});
+
+		voiceHandler.once('error', err => {
+			console.log('Stream Error: ' + err);
+		});
+
+		voiceHandler.once('end', reason => {
+			console.log('Playback ended, reason: ' + reason);
+			voiceHandler = null;
+			bot.user.setGame();
+			if (!stopped && !isQueueEmpty()) {
+				playNextSong();
+			} else if (autoPlayToggle) {
+				startAutoPlaylist();
+			}
+		});
+	} else {
+		bandcamp.getTrack(videoId).then(stream => {
+			if (isStream(stream)) {
+				voiceHandler = voiceConnection.playStream(stream);
+				voiceHandler.setVolumeDecibels('-20');
+				if (informNp) {
+					const embed = new Discord.RichEmbed()
+						.setTitle('Now playing: ' + title)
+						// .setImage('https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg')
+						.setURL(nowPlayingData.videoId)
+						.setFooter('Requested by ' + user);
+					textChannel.sendEmbed(embed);
+				}
+			}
+			voiceHandler.on('debug', information => {
+				console.log('Stream Debug: ' + information);
+			});
+
+			voiceHandler.once('error', err => {
+				console.log('Stream Error: ' + err);
+			});
+
+			voiceHandler.once('end', reason => {
+				console.log('Playback ended, reason: ' + reason);
+				voiceHandler = null;
+				bot.user.setGame();
+				if (!stopped && !isQueueEmpty()) {
+					playNextSong();
+				} else if (autoPlayToggle) {
+					startAutoPlaylist();
+				}
+			});
+		}).catch(err => {
+			console.log(err);
+		});
+	}
+	bot.user.setGame(title);
 
 	queue.splice(0, 1);
 }

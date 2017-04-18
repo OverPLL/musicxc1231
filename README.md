@@ -17,7 +17,7 @@ I forked it from [agubelu/discord-music-bot](https://github.com/agubelu/discord-
 - **!queue** - Displays the queue.
 - **!reload** - Reload bot.
 - **!remove \<request index or 'last'>** - Removes a specific request from the queue. `!remove last` will delete the last request that was added.
-- **!request \<video/playlist/alias>** - Adds a YouTube video or playlist to the queue. You can provide the full URL, just the video ID, full playlist URL or an alias.
+- **!request \<video/playlist/alias>** - Adds a YouTube video, Bandcamp track or YouTube playlist to the queue. You can provide the full URL, just the video ID, full playlist URL or an alias.
 - **!resume** - Allows the bot to play videos from the queue again after !stop was issued.
 - **!saveplaylist \<playlist/alias>** - Send text file containing all video URLs in playlist to channel.
 - **!search \<query>** - Searches for a video on YouTube and adds it to the queue. Requires a [YouTube API key](#obtaining-a-youtube-api-key).
