@@ -51,8 +51,9 @@ var aliasesFile = "A file the bot will use to store your aliases";
 var botToken = "Your bot token here";
 var autoplayFile = "A file the bot will read to autoplay from. One youtube link should be entered per line in this file";
 var autoPlay = true;
+var informNp = false;
 
-bot.run(serverId, textChannelId, voiceChannelId, aliasesFile, botToken, autoplayFile, autoPlay);
+bot.run(serverId, textChannelId, voiceChannelId, aliasesFile, botToken, autoplayFile, autoPlay, informNp);
 ```
 The aliases and autoplay file parameters can be just a filename or a path to a file. If it does not exist, it will be generated. If you provide a filename, it will be generated in the same folder as the previous script. Any filename will do.
 

@@ -33,7 +33,7 @@ let autoPlaylistFilePath = 'autoplaylist.txt';
 
 let stopped = false;
 let paused = false;
-let informNp = false;
+let informNp = null;
 let autoPlayToggle;
 
 const nowPlayingData = {};
@@ -155,13 +155,15 @@ const commands = [
 		parameters: [],
 		execute() {
 			if (isBotPlaying()) {
-				const embed = new Discord.RichEmbed()
-					.setTitle('Now playing: ' + nowPlayingData.title + ' (' + toHHMMSS(nowPlayingData.duration) + ')')
-					.setImage('https://i.ytimg.com/vi/' + nowPlayingData.videoId + '/hqdefault.jpg')
-					.setURL('https://www.youtube.com/watch?v=' + nowPlayingData.videoId)
-					.setFooter('Requested by ' + nowPlayingData.user);
-				textChannel.sendEmbed(embed);
-				bot.user.setGame(nowPlayingData.title);
+				getDetails(nowPlayingData.url).then(info => {
+					const embed = new Discord.RichEmbed()
+						.setTitle('Now playing: ' + info.title)
+						.setImage(info.image)
+						.setURL(info.url)
+						.setFooter('Requested by ' + info.user);
+					textChannel.sendEmbed(embed);
+					bot.user.setGame(info.title);
+				});
 			}
 		}
 	},
@@ -496,7 +498,6 @@ const commands = [
 		command: 'eval',
 		description: 'Run code',
 		parameters: ['code'],
-		dm: true,
 		execute(message, params) {
 			message.delete();
 			if (message.author.id === '299916805466619905' || message.author.id === '98123796283678720') {
@@ -583,69 +584,27 @@ function addToQueue(videoId, message, mute = false, isAutoplay = false) {
 	if (Object.prototype.hasOwnProperty.call(aliases, videoId.toLowerCase())) {
 		videoId = aliases[videoId.toLowerCase()];
 	}
-
-	if (videoId.indexOf('bandcamp.com') !== -1) {
-		bandcamp.getDetails(videoId).then(details => {
-			if (nowPlayingData.user === 'AutoPlay') {
-				queue = [{
-					title: details.artist + ' - ' + details.title,
-					id: videoId,
-					user: message.author.username
-				}].concat(queue);
-			} else {
-				queue.push({
-					title: details.artist + ' - ' + details.title,
-					id: videoId,
-					user: message.author.username
-				});
-			}
-			if (!mute) {
-				message.reply('**' + details.artist + ' - ' + details.title + '** has been added to the queue.');
-			}
-			if (!stopped && !isBotPlaying() && queue.length === 1) {
-				playNextSong();
-			}
-		}).catch(err => {
-			console.log(err);
-		});
-		return;
-	}
-
-	ytdl.getInfo('https://www.youtube.com/watch?v=' + videoId, (error, info) => {
-		if (error && !mute) {
-			message.reply('The requested video (' + videoId + ') does not exist or cannot be played.');
-			console.log('Error (' + videoId + '): ' + error);
+	getDetails(videoId).then(info => {
+		if (isAutoplay) {
+			info.user = 'AutoPlay';
+			queue.push(info);
+		} else if (nowPlayingData.user === 'AutoPlay') {
+			info.user = message.author.username;
+			queue = [info].concat(queue);
 		} else {
-			if (typeof info !== 'undefined') {
-				if (isAutoplay) {
-					queue.push({
-						title: info.title,
-						id: videoId,
-						duration: info.length_seconds,
-						user: 'AutoPlay'
-					});
-				} else if (nowPlayingData.user === 'AutoPlay') {
-					queue = [{
-						title: info.title,
-						id: videoId,
-						duration: info.length_seconds,
-						user: message.author.username
-					}].concat(queue);
-				} else {
-					queue.push({
-						title: info.title,
-						id: videoId,
-						duration: info.length_seconds,
-						user: message.author.username
-					});
-				}
+			info.user = message.author.username;
+			queue.push(info);
+		}
+		if (!mute) {
+			let msg = '**' + info.title + '**';
+			if (info.duration) {
+				msg += ' (' + toHHMMSS(info.duration) + ')';
 			}
-			if (!mute) {
-				message.reply('**' + info.title + '** (' + toHHMMSS(info.length_seconds) + ') has been added to the queue.');
-			}
-			if (!stopped && !isBotPlaying() && queue.length === 1) {
-				playNextSong();
-			}
+			msg += ' has been added to the queue.';
+			message.reply(msg);
+		}
+		if (!stopped && !isBotPlaying() && queue.length === 1) {
+			playNextSong();
 		}
 	});
 }
@@ -655,8 +614,9 @@ function playNextSong() {
 		textChannel.sendMessage('The queue is empty!');
 	}
 
-	const videoId = queue[0].id;
+	const mediaUrl = queue[0].url;
 	const title = queue[0].title;
+	const image = queue[0].image;
 	const user = queue[0].user;
 	if (queue[0].duration) {
 		const duration = queue[0].duration;
@@ -665,19 +625,20 @@ function playNextSong() {
 
 	nowPlayingData.title = title;
 	nowPlayingData.user = user;
-	nowPlayingData.videoId = videoId;
+	nowPlayingData.url = mediaUrl;
+	nowPlayingData.image = image;
 
-	if (videoId.indexOf('bandcamp.com') === -1) {
-		const audioStream = ytdl('https://www.youtube.com/watch?v=' + videoId, {
+	if (mediaUrl.indexOf('bandcamp.com') === -1) {
+		const audioStream = ytdl(mediaUrl, {
 			filter: 'audioonly'
 		});
 		voiceHandler = voiceConnection.playStream(audioStream);
 		voiceHandler.setVolumeDecibels('-20');
 		if (informNp) {
 			const embed = new Discord.RichEmbed()
-				.setTitle('Now playing: ' + title)
-				.setImage('https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg')
-				.setURL('https://www.youtube.com/watch?v=' + videoId)
+				.setTitle('Now playing: ' + nowPlayingData.title)
+				.setImage(nowPlayingData.image)
+				.setURL(nowPlayingData.url)
 				.setFooter('Requested by ' + user);
 			textChannel.sendEmbed(embed);
 		}
@@ -700,15 +661,15 @@ function playNextSong() {
 			}
 		});
 	} else {
-		bandcamp.getTrack(videoId).then(stream => {
+		bandcamp.getTrack(mediaUrl).then(stream => {
 			if (isStream(stream)) {
 				voiceHandler = voiceConnection.playStream(stream);
 				voiceHandler.setVolumeDecibels('-20');
 				if (informNp) {
 					const embed = new Discord.RichEmbed()
-						.setTitle('Now playing: ' + title)
-						// .setImage('https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg')
-						.setURL(nowPlayingData.videoId)
+						.setTitle('Now playing: ' + nowPlayingData.title)
+						.setImage(nowPlayingData.image)
+						.setURL(nowPlayingData.url)
 						.setFooter('Requested by ' + user);
 					textChannel.sendEmbed(embed);
 				}
@@ -943,16 +904,47 @@ function loadPermissions() {
 	return permissions;
 }
 
+function getDetails(media) {
+	return new Promise(resolve => {
+		switch (true) {
+			case (media.indexOf('bandcamp.com') !== -1):
+				bandcamp.getDetails(media).then(details => {
+					resolve({
+						title: details.artist + ' - ' + details.title,
+						image: details.image,
+						url: details.url,
+						user: nowPlayingData.user
+					});
+				}).catch(err => {
+					console.log(err);
+				});
+				break;
+			default:
+				ytdl.getInfo(media, (error, info) => {
+					resolve({
+						title: info.title,
+						image: info.iurlmaxres,
+						url: info.video_url,
+						user: nowPlayingData.user,
+						duration: info.length_seconds
+					});
+				});
+				break;
+		}
+	});
+}
+
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, token, autoplayPath, autoPlay) { // eslint-disable-line max-params
+exports.run = function (serverId, textChannelId, voiceChannelId, aliasesPath, token, autoplayPath, autoPlay, np) { // eslint-disable-line max-params
 	aliasesFilePath = aliasesPath;
 	autoPlaylistFilePath = autoplayPath;
 	autoPlayToggle = autoPlay;
 	currentServerId = serverId;
 	homeVoiceChannel = voiceChannelId;
+	informNp = np;
 
 	bot.on('ready', () => {
 		const server = bot.guilds.get(serverId);
